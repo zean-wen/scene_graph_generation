@@ -57,7 +57,7 @@ def tier_node_feature_generation(tier, word_embed, args):
     object_features = h5py.File(os.path.join(args.object_feature_folder, '{}_objects.h5'.format(tier)), 'r')
     print('### Object feature loaded!')
 
-    node_feature_h5 = h5py.File(os.path.join(args.export_folder, '{}_node_feature'.format(tier)), 'w')
+    node_feature_h5 = h5py.File(os.path.join(args.export_folder, '{}_node_feature.h5'.format(tier)), 'w')
     node_feature_h5.create_dataset("node_feature", (len(image_id_to_ix), 36, 2348), dtype='f4')
 
     for image_id, index in tqdm(image_id_to_ix.items(), unit='image', desc='Node feature generation'):
