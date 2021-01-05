@@ -37,7 +37,7 @@ def image_node_feature_generation(word_embed, image_scene_graph, image_object_fe
     object_name_embedding = np.zeros((36, 300), dtype='float32')
     for index, _object in enumerate(image_scene_graph['objects'].values()):
         object_name_embedding[index] = word_embed(_object['name'])
-    return np.concatenate((object_name_embedding, image_object_feature), dim=1)
+    return np.concatenate((object_name_embedding, image_object_feature),  axis=1)
 
 
 def tier_node_feature_generation(tier, word_embed, args):
