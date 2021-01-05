@@ -41,21 +41,21 @@ def image_node_feature_generation(word_embed, image_scene_graph, image_object_fe
 
 
 def tier_node_feature_generation(tier, word_embed, args):
-    print('generating node feature for {} images'.format(tier))
+    print('#### Generating node feature for {} images ####'.format(tier))
 
-    print('Loading ids map...')
+    print('### Loading ids map...')
     with open(os.path.join(args.ids_map_folder, '{}_ids_map.json'.format(tier)), 'r') as f:
         image_id_to_ix = json.load(f)['image_id_to_ix']
-    print('ids map loaded!')
+    print('### ids map loaded!')
 
-    print('Loading scene graph...')
+    print('### Loading scene graph...')
     with open(os.path.join(args.scene_graph_folder, '{}_sg.json'.format(tier)), 'r') as f:
         scene_graphs = json.load(f)
-    print('Scene graph loaded!')
+    print('### Scene graph loaded!')
 
-    print('Loading object features...')
+    print('### Loading object features...')
     object_features = h5py.File(os.path.join(args.object_feature_folder, '{}_objects.h5'.format(tier)), 'r')
-    print('Object feature loaded!')
+    print('### Object feature loaded!')
 
     node_feature_h5 = h5py.File(os.path.join(args.export, '{}_node_feature'.format(tier)), 'w')
     node_feature_h5.create_dataset("node_feature", (len(image_id_to_ix), 36, 2348), dtype='f4')
