@@ -44,7 +44,7 @@ def tier_node_feature_generation(tier, word_embed, args):
     print('generating node feature for {} images'.format(tier))
 
     print('Loading ids map')
-    with open(os.path.join(args.ids_map_folder, '{}_ids_map.json'.format(tier), 'r')) as f:
+    with open(os.path.join(args.ids_map_folder, '{}_ids_map.json'.format(tier)), 'r') as f:
         image_id_to_ix = json.load(f)['image_id_to_ix']
     print('ids map loaded')
 
