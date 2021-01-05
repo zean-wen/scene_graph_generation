@@ -49,7 +49,7 @@ def tier_node_feature_generation(tier, word_embed, args):
     print('ids map loaded')
 
     print('Loading scene graph ')
-    with open(os.path.join(args.scene_graph_folder, '{}_sg.json'.format(tier), 'r')) as f:
+    with open(os.path.join(args.scene_graph_folder, '{}_sg.json'.format(tier)), 'r') as f:
         scene_graphs = json.load(f)
     print('Scene graph loaded')
 
