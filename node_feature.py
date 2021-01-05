@@ -19,7 +19,7 @@ def get_args():
 
 
 class WordEmbedding:
-    def __int__(self, dictionary_file, word_matrix_file):
+    def __init__(self, dictionary_file, word_matrix_file):
         with open(dictionary_file, 'r') as f:
             self.word_to_idx = json.load(f)['word_to_ix']
         self.index_to_vector = np.load(word_matrix_file)
@@ -59,7 +59,7 @@ def tier_node_feature_generation(tier, word_embed, args):
     node_feature_h5 = h5py.File(os.path.join(args.export, '{}_node_feature'.format(tier)), 'w')
     node_feature_h5.create_dataset("node_feature", (len(image_id_to_ix), 36, 2348), dtype='f4')
 
-    for image_id, index in  tqdm(image_id_to_ix.items(), unit='image', desc='Node feature generation'):
+    for image_id, index in tqdm(image_id_to_ix.items(), unit='image', desc='Node feature generation'):
         image_scene_graph = scene_graphs[image_id]
         image_object_feature = object_features['features'][index]
         image_node_feature = image_node_feature_generation(word_embed, image_scene_graph, image_object_feature)
