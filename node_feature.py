@@ -73,7 +73,7 @@ def main():
 
     word_embed = WordEmbedding(args.dictionary_file, args.word_matrix_file)
 
-    for tier in ['trian', 'val', 'test']:
+    for tier in ['train', 'val', 'test']:
         tier_node_feature_generation(tier, word_embed, args)
 
 
