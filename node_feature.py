@@ -10,6 +10,7 @@ import numpy as np
 
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--tiers', type=str, default='train_val_test', help='path to save result')
     parser.add_argument('--save_folder', type=str, help='path to save result')
     parser.add_argument('--ids_map_folder', type=str, help='image index map file')
     parser.add_argument('--scene_graph_folder', type=str, help='file path save the scene graph')
@@ -31,6 +32,7 @@ class WordEmbeddingConfig:
 
 
 class Config:
+    tiers: str
     save_folder: str
     ids_map_folder: str
     scene_graph_folder: str
@@ -39,6 +41,7 @@ class Config:
     word_embed_config: WordEmbeddingConfig = WordEmbeddingConfig()
 
     def parse_from_args(self, args):
+        self.tiers = args.tiers
         self.save_folder = args.save_folder
         self.ids_map_folder = args.ids_map_folder
         self.scene_graph_folder = args.scene_graph_folder
@@ -152,17 +155,17 @@ def main():
     args = get_args()
     config = Config()
     config.parse_from_args(args)
-    for tier in ['train', 'val', 'test']:
+    tiers = config.tiers.split('_')
+    for tier in tiers:
         print('#### Generating node feature for {} images ####'.format(tier))
         h5_file_dir = os.path.join(config.save_folder, '{}_node_features'.format(tier))
         ids_map_json = os.path.join(config.ids_map_folder, '{}_ids_map.json'.format(tier))
+        scene_graph_json = os.path.join(config.scene_graph_folder, '{}_sg.json'.format(tier))
         if tier == 'val':
-            scene_graph_json = os.path.join(config.scene_graph_folder, '{}_sg.json'.format('train'))
             ocr_json = os.path.join(config.ocr_folder, '{}_ocr.json'.format('train'))
         else:
-            scene_graph_json = os.path.join(config.scene_graph_folder, '{}_sg.json'.format(tier))
-            ocr_json = os.path.join(config.ocr_folder, '{}_ocr.json'.format(tier))
 
+            ocr_json = os.path.join(config.ocr_folder, '{}_ocr.json'.format(tier))
         visual_feature_h5 = os.path.join(config.visual_feature_folder, '{}_objects.h5'.format(tier))
         node_feature = NodeFeature(h5_file_dir, ids_map_json, scene_graph_json, visual_feature_h5, ocr_json, config.word_embed_config)
         node_feature.build()
