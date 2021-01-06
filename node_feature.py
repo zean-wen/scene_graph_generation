@@ -36,7 +36,7 @@ class Config:
     scene_graph_folder: str
     ocr_folder: str
     visual_feature_folder: str
-    word_embed_config: WordEmbeddingConfig
+    word_embed_config: WordEmbeddingConfig = WordEmbeddingConfig()
 
     def parse_from_args(self, args):
         self.save_folder = args.save_folder
