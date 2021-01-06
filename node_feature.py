@@ -164,7 +164,8 @@ def main():
             ocr_json = os.path.join(config.ocr_folder, '{}_ocr.json'.format(tier))
 
         visual_feature_h5 = os.path.join(config.visual_feature_folder, '{}_objects.h5'.format(tier))
-        NodeFeature(h5_file_dir, ids_map_json, scene_graph_json, visual_feature_h5, ocr_json, config.word_embed_config)
+        node_feature = NodeFeature(h5_file_dir, ids_map_json, scene_graph_json, visual_feature_h5, ocr_json, config.word_embed_config)
+        node_feature.build()
 
 
 if __name__ == '__main__':
