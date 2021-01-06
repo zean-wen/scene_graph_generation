@@ -99,7 +99,7 @@ class NodeFeature:
         for image_index in tqdm(range(self.n_images),
                                 unit='image',
                                 desc='Object name embedding generation'):
-            image_id = self.image_ix_to_id[image_index]
+            image_id = self.image_ix_to_id[str(image_index)]
             image_scene_graph = scene_graphs[image_id]
             image_object_name_embedding = np.zeros((36, 300), dtype='float32')
             for object_index, _object in enumerate(image_scene_graph['objects'].values()):
@@ -129,7 +129,7 @@ class NodeFeature:
         for image_index in tqdm(range(self.n_images),
                                 unit='image',
                                 desc='Ocr feature generation'):
-            image_id = self.image_ix_to_id[image_index]
+            image_id = self.image_ix_to_id[str(image_index)]
             image_ocr = ocr[image_id]
             image_ocr_token_embedding = np.zeros((max_len, 300), dtype='float32')
             image_ocr_bounding_boxes = np.zerps((max_len, 8), dtype='float32')
