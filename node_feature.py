@@ -103,7 +103,7 @@ class NodeFeature:
             image_scene_graph = scene_graphs[image_id]
             image_object_name_embedding = np.zeros((36, 300), dtype='float32')
             for object_index, _object in enumerate(image_scene_graph['objects'].values()):
-                image_object_name_embedding[image_index] = word_embed(_object['name'])
+                image_object_name_embedding[object_index] = word_embed(_object['name'])
             self.h5_file["object_name_embedding"][image_index] = image_object_name_embedding
         del scene_graphs
 
