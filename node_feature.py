@@ -132,7 +132,7 @@ class NodeFeature:
             image_id = self.image_ix_to_id[str(image_index)]
             image_ocr = ocr[image_id]
             image_ocr_token_embedding = np.zeros((max_len, 300), dtype='float32')
-            image_ocr_bounding_boxes = np.zerps((max_len, 8), dtype='float32')
+            image_ocr_bounding_boxes = np.zeros((max_len, 8), dtype='float32')
             for ocr_index, (ocr_token, bbox) in enumerate(image_ocr.items()):
                 image_ocr_token_embedding[ocr_index] = word_embed(ocr_token)
                 image_ocr_bounding_boxes[ocr_index] = np.array(bbox).flatten()
