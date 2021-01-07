@@ -50,7 +50,7 @@ def main():
     for tier in tiers:
         print('#### Generating adjacent matrix for {} images ####'.format(tier))
         h5_file_dir = os.path.join(args.save_folder, '{}_adj_matrix.h5'.format(tier))
-        adj_matrix_json = os.path.join(args.adj_matrix_folder, '{}_edge_rdiou.json '.format(tier))
+        adj_matrix_json = os.path.join(args.adj_matrix_folder, '{}_edge_rdiou.json'.format(tier))
         ids_map_json = os.path.join(args.ids_map_folder, '{}_ids_map.json'.format(tier))
         generate_adj_matrix(h5_file_dir, adj_matrix_json, ids_map_json)
 
