@@ -11,7 +11,6 @@ def get_args():
     parser.add_argument('--save_folder', type=str, help='path to save result')
     parser.add_argument('--node_feature_folder', type=str, help='path where save node features')
     parser.add_argument('--ids_map_folder', type=str, help='image index map file')
-    parser.add_argument()
 
     return parser.parse_args()
 
