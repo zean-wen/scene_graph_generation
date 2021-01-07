@@ -1,7 +1,6 @@
 import os
 import argparse
 
-# from dataclasses import dataclass
 from tqdm import tqdm
 import h5py
 import json
@@ -10,12 +9,12 @@ import numpy as np
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--tiers', type=str, default='train_val_test', help='path to save result')
+    parser.add_argument('--tiers', type=str, default='train_val_test', help='train, val, test')
     parser.add_argument('--save_folder', type=str, help='path to save result')
     parser.add_argument('--ids_map_folder', type=str, help='image index map file')
     parser.add_argument('--scene_graph_folder', type=str, help='file path save the scene graph')
-    parser.add_argument('--ocr_folder', type=str, help='path where ocr saved')
     parser.add_argument('--visual_feature_folder', type=str, help='path where the object feature saved')
+    parser.add_argument('--ocr_folder', type=str, help='path where ocr saved')
     parser.add_argument('--glove_dictionary_file', type=str, help='dictionary file')
     parser.add_argument('--glove_word_matrix_file', type=str, help='word embedding matrix file')
     parser.add_argument('--fasttext_dictionary_file', type=str, help='dictionary file')
@@ -77,7 +76,13 @@ class WordEmbedding:
 
 
 class NodeFeature:
-    def __init__(self, h5_file_dir, ids_map_json, scene_graph_json, visual_feature_h5, ocr_json, word_emb_config):
+    def __init__(self,
+                 h5_file_dir,
+                 ids_map_json,
+                 scene_graph_json,
+                 visual_feature_h5,
+                 ocr_json,
+                 word_emb_config):
 
         self.h5_file = h5py.File(h5_file_dir, 'w')
         with open(ids_map_json, 'r') as f:
@@ -155,19 +160,25 @@ def main():
     args = get_args()
     config = Config()
     config.parse_from_args(args)
+
     tiers = config.tiers.split('_')
     for tier in tiers:
         print('#### Generating node feature for {} images ####'.format(tier))
-        h5_file_dir = os.path.join(config.save_folder, '{}_node_features'.format(tier))
+        h5_file_dir = os.path.join(config.save_folder, '{}_node_features.h5'.format(tier))
         ids_map_json = os.path.join(config.ids_map_folder, '{}_ids_map.json'.format(tier))
         scene_graph_json = os.path.join(config.scene_graph_folder, '{}_sg.json'.format(tier))
+        visual_feature_h5 = os.path.join(config.visual_feature_folder, '{}_objects.h5'.format(tier))
         if tier == 'val':
             ocr_json = os.path.join(config.ocr_folder, '{}_ocr.json'.format('train'))
         else:
-
             ocr_json = os.path.join(config.ocr_folder, '{}_ocr.json'.format(tier))
-        visual_feature_h5 = os.path.join(config.visual_feature_folder, '{}_objects.h5'.format(tier))
-        node_feature = NodeFeature(h5_file_dir, ids_map_json, scene_graph_json, visual_feature_h5, ocr_json, config.word_embed_config)
+
+        node_feature = NodeFeature(h5_file_dir,
+                                   ids_map_json,
+                                   scene_graph_json,
+                                   visual_feature_h5,
+                                   ocr_json,
+                                   config.word_embed_config)
         node_feature.build()
 
 
