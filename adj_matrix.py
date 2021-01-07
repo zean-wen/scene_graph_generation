@@ -35,7 +35,7 @@ def generate_adj_matrix(h5_file_dir, adj_matrix_json, ids_map_json):
     adj_h5.create_dataset("adjacent_matrix", (n_images, max_len, max_len), dtype='float32')
 
     for image_index in tqdm(range(len(image_ix_to_id)), unit='image'):
-        image_id = image_ix_to_id[image_index]
+        image_id = image_ix_to_id[str(image_index)]
         image_adj_matrix = np.array(adj_matrix[image_id])
         image_adj_matrix_pad = np.zeros((max_len, max_len), dtype='float32')
         image_adj_matrix_pad[:image_adj_matrix.shape[0], :image_adj_matrix.shape[1]] = image_adj_matrix
