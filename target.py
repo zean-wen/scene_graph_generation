@@ -34,7 +34,7 @@ def main():
     tiers = args.tiers.split('_')
     for tier in tiers:
         print('#### Generating target data for {} images ####'.format(tier))
-        h5_file_dir = os.path.join(args.save_folder, '{}_adj_matrix.h5'.format(tier))
+        h5_file_dir = os.path.join(args.save_folder, '{}_target.h5'.format(tier))
         ids_map_json = os.path.join(args.ids_map_folder, '{}_ids_map.json'.format(tier))
         node_feature_dir = os.path.join(args.node_feature_folder, '{}_node_features.h5'.format(tier))
         target_generation(h5_file_dir, ids_map_json, node_feature_dir)
