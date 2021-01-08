@@ -120,7 +120,7 @@ class AdjMatrix:
         n_images = len(self.image_ix_to_id)
         for image_index in tqdm(range(n_images),
                                 unit='image',
-                                desc='adjacent matrix generation'):
+                                desc='Adjacent matrix generation'):
             image_id = self.image_ix_to_id[str(image_index)]
             image_adj_matrix = np.array(adjacent_matrix[image_id])
             with open(os.path.join(self.save_dir, '{}.p'.format(image_index)), 'wb') as f:
@@ -141,7 +141,7 @@ class Target:
         for image_index in tqdm(range(n_images),
                                 unit='image',
                                 desc='target generation'):
-            image_id = self.image_ix_to_id[image_index]
+            image_id = self.image_ix_to_id[str(image_index)]
             n_ocr = len(self.ocr[image_id])
             image_scene_graph = self.scene_graphs[image_id]
             n_objects = len(image_scene_graph['objects'])
@@ -160,6 +160,7 @@ class DataSet:
                  ids_map_dir,
                  data_root,
                  word_emb_config):
+        self.tier = tier
         save_dir = os.path.join(save_dir, 'textvqa_{}'.format(tier))
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
@@ -189,6 +190,7 @@ class DataSet:
         self.target = Target(save_dir, image_ix_to_id, scene_graphs, ocr)
 
     def generate(self):
+        print('#### Generating graph data for {} images ####'.format(self.tier))
         self.node_feature.generate()
         self.adjacent_matrix.generate()
         self.target.generate()
