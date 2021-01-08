@@ -162,7 +162,10 @@ class DataSet:
         ids_map_dir = os.path.join(ids_map_dir, '{}_ids_map.json'.format(tier))
         scene_graph_dir = os.path.join(data_root, 'scene_graph', '{}_sg.json'.format(tier))
         visual_feature_dir = os.path.join(data_root, 'object_visual_feature', '{}_objects.h5'.format(tier))
-        ocr_dir = os.path.join(data_root, 'ocr', '{}_ocr.json'.format(tier))
+        if tier == 'val':
+            ocr_dir = os.path.join(data_root, 'ocr', '{}_ocr.json'.format('train'))
+        else:
+            ocr_dir = os.path.join(data_root, 'ocr', '{}_ocr.json'.format(tier))
         adj_matrix_dir = os.path.join(data_root, 'adjacent_matrix', '{}_edge_rdiou.json'.format(tier))
 
         with open(ids_map_dir, 'r') as f:
