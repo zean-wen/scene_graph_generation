@@ -146,7 +146,7 @@ class Target:
             image_scene_graph = self.scene_graphs[image_id]
             n_objects = len(image_scene_graph['objects'])
             n_nodes = n_objects + n_ocr
-            image_target = np.zeros(n_nodes, 2)
+            image_target = np.zeros((n_nodes, 2), dtype='float32')
             image_target[:n_objects, 0] = 1
             image_target[n_objects:, 1] = 1
             with open(os.path.join(self.save_dir, '{}.p'.format(image_index)), 'wb') as f:
