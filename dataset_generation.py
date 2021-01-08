@@ -45,7 +45,7 @@ class NodeFeature:
         if not os.path.exists(node_feature_dir):
             os.mkdir(node_feature_dir)
         self.dir = {'object_name_embeddings': os.path.join(node_feature_dir, 'object_name_embeddings'),
-                    'object_visual_feature': os.path.join(node_feature_dir, 'object_visual_features'),
+                    'object_visual_features': os.path.join(node_feature_dir, 'object_visual_features'),
                     'ocr_token_embeddings': os.path.join(node_feature_dir, 'ocr_token_embeddings'),
                     'ocr_bounding_boxes': os.path.join(node_feature_dir, 'ocr_bounding_boxes')}
         for path in self.dir.values():
