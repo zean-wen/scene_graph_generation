@@ -3,7 +3,7 @@ class BaseConfig:
     def copy_from_args(cls, args):
         for key, value in vars(args).items():
             if hasattr(cls, key):
-                setattr(object, key, value)
+                setattr(cls, key, value)
         return cls()
 
 
