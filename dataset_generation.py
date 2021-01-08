@@ -42,6 +42,8 @@ class NodeFeature:
         self.word_emb_config = word_emb_config
 
         node_feature_dir = os.path.join(save_dir, 'node_features')
+        if not os.path.exists(node_feature_dir):
+            os.mkdir(node_feature_dir)
         self.dir = {'object_name_embeddings': os.path.join(node_feature_dir, 'object_name_embeddings'),
                     'object_visual_feature': os.path.join(node_feature_dir, 'object_visual_features'),
                     'ocr_token_embeddings': os.path.join(node_feature_dir, 'ocr_token_embeddings'),
@@ -159,6 +161,8 @@ class DataSet:
                  data_root,
                  word_emb_config):
         save_dir = os.path.join(save_dir, 'textvqa_{}'.format(tier))
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
         ids_map_dir = os.path.join(ids_map_dir, '{}_ids_map.json'.format(tier))
         scene_graph_dir = os.path.join(data_root, 'scene_graph', '{}_sg.json'.format(tier))
         visual_feature_dir = os.path.join(data_root, 'object_visual_feature', '{}_objects.h5'.format(tier))
