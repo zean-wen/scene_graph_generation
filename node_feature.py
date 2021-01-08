@@ -6,6 +6,9 @@ import h5py
 import json
 import numpy as np
 
+from config import Config
+from utils import WordEmbedding
+
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -21,58 +24,6 @@ def get_args():
     parser.add_argument('--fasttext_word_matrix_file', type=str, help='word embedding matrix file')
 
     return parser.parse_args()
-
-
-class WordEmbeddingConfig:
-    glove_dictionary_file: str
-    glove_word_matrix_file: str
-    fasttext_dictionary_file: str
-    fasttext_word_matrix_file: str
-
-
-class Config:
-    tiers: str
-    save_folder: str
-    ids_map_folder: str
-    scene_graph_folder: str
-    ocr_folder: str
-    visual_feature_folder: str
-    word_embed_config: WordEmbeddingConfig = WordEmbeddingConfig()
-
-    def parse_from_args(self, args):
-        self.tiers = args.tiers
-        self.save_folder = args.save_folder
-        self.ids_map_folder = args.ids_map_folder
-        self.scene_graph_folder = args.scene_graph_folder
-        self.ocr_folder = args.ocr_folder
-        self.visual_feature_folder = args.visual_feature_folder
-        self.word_embed_config.glove_dictionary_file = args.glove_dictionary_file
-        self.word_embed_config.glove_word_matrix_file = args.glove_word_matrix_file
-        self.word_embed_config.fasttext_dictionary_file = args.fasttext_dictionary_file
-        self.word_embed_config.fasttext_word_matrix_file = args.fasttext_word_matrix_file
-
-
-class WordEmbedding:
-    def __init__(self, embedding_method, config):
-        if embedding_method.lower() == 'glove':
-            dictionary_file = config.glove_dictionary_file
-            word_matrix_file = config.glove_word_matrix_file
-        elif embedding_method.lower() == 'fasttext':
-            dictionary_file = config.fasttext_dictionary_file
-            word_matrix_file = config.fasttext_word_matrix_file
-        else:
-            raise ValueError('{} embedding method is allowed'.format(embedding_method))
-        with open(dictionary_file, 'r') as f:
-            self.word_to_idx = json.load(f)['word_to_ix']
-        self.index_to_vector = np.load(word_matrix_file)
-
-    def __call__(self, token):
-        try:
-            index = self.word_to_idx[token]
-        except KeyError:
-            index = self.word_to_idx['unknown']
-        vector = self.index_to_vector[index]
-        return vector
 
 
 class NodeFeature:
@@ -159,7 +110,7 @@ class NodeFeature:
 def main():
     args = get_args()
     config = Config()
-    config.parse_from_args(args)
+    config.copy_from_args(args)
 
     tiers = config.tiers.split('_')
     for tier in tiers:
