@@ -1,8 +1,10 @@
 class BaseConfig:
-    def copy_from_args(self, args):
+    @ classmethod
+    def copy_from_args(cls, args):
         for key, value in vars(args).items():
-            if hasattr(self, key):
+            if hasattr(cls, key):
                 setattr(object, key, value)
+        return cls()
 
 
 class WordEmbeddingConfig(BaseConfig):
@@ -22,8 +24,10 @@ class Config(BaseConfig):
     visual_feature_folder: str
     word_emb_config: WordEmbeddingConfig = WordEmbeddingConfig()
 
-    def copy_from_args(self, args):
+    @ classmethod
+    def copy_from_args(cls, args):
         for key, value in vars(args).items():
-            if hasattr(self, key):
+            if hasattr(cls, key):
                 setattr(object, key, value)
-        self.word_emb_config.copy_from_args(args)
+        cls.word_emb_config = WordEmbeddingConfig.copy_from_args(args)
+        return cls()
