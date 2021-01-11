@@ -1,6 +1,7 @@
 import json
 import numpy as np
 
+
 class WordEmbedding:
     def __init__(self, embedding_method, config):
         if embedding_method.lower() == 'glove':
@@ -22,3 +23,10 @@ class WordEmbedding:
             index = self.word_to_idx['unknown']
         vector = self.index_to_vector[index]
         return vector
+
+
+def delete_zero_padding(image_object_visual_features):
+    image_object_visual_features = image_object_visual_features[~np.all(
+        image_object_visual_features == 0,
+        axis=1)]
+    return image_object_visual_features

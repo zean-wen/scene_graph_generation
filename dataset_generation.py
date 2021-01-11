@@ -3,24 +3,18 @@ import argparse
 
 import pickle
 import h5py
-import json
 import numpy as np
 from tqdm import tqdm
 
 from config import Config
-from utils import WordEmbedding
+from utils import *
 
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--tiers', type=str, default='train_val_test', help='train, val, test')
     parser.add_argument('--save_dir', type=str, help='path to save result')
-    parser.add_argument('--ids_map_dir', type=str, help='image index map file')
     parser.add_argument('--data_root', type=str, help='path where the input data saved')
-    parser.add_argument('--glove_dictionary_file', type=str, help='dictionary file')
-    parser.add_argument('--glove_word_matrix_file', type=str, help='word embedding matrix file')
-    parser.add_argument('--fasttext_dictionary_file', type=str, help='dictionary file')
-    parser.add_argument('--fasttext_word_matrix_file', type=str, help='word embedding matrix file')
 
     return parser.parse_args()
 
@@ -29,16 +23,19 @@ class NodeFeature:
     def __init__(self,
                  save_dir,
                  image_ix_to_id,
-                 scene_graphs,
+                 n_images,
+                 nodes,
+                 image_n_objects,
                  ocr,
                  visual_feature_h5,
                  word_emb_config):
 
         self.image_ix_to_id = image_ix_to_id
-        self.scene_graphs = scene_graphs
+        self.nodes = nodes
+        self.image_n_objects = image_n_objects
         self.visual_feature_h5 = visual_feature_h5
         self.ocr = ocr
-        self.n_images = len(self.image_ix_to_id)
+        self.n_images = n_images
         self.word_emb_config = word_emb_config
 
         node_feature_dir = os.path.join(save_dir, 'node_features')
@@ -63,11 +60,11 @@ class NodeFeature:
                                 unit='image',
                                 desc='Object name embedding generation'):
             image_id = self.image_ix_to_id[str(image_index)]
-            image_scene_graph = self.scene_graphs[image_id]
-            n_objects = len(image_scene_graph['objects'])
+            image_nodes = self.nodes[image_id]
+            n_objects = self.image_n_objects[image_index]
             image_object_name_embeddings = np.zeros((n_objects, 300), dtype='float32')
-            for object_index, _object in enumerate(image_scene_graph['objects'].values()):
-                image_object_name_embeddings[object_index] = word_embed(_object['name'])
+            for object_index in range(n_objects):
+                image_object_name_embeddings[object_index] = word_embed(image_nodes[object_index])
             with open(os.path.join(self.dir['object_name_embeddings'], '{}.p'.format(image_index)), 'wb') as f:
                 pickle.dump(image_object_name_embeddings, f)
 
@@ -128,23 +125,21 @@ class AdjMatrix:
 
 
 class Target:
-    def __init__(self, save_dir, image_ix_to_id, scene_graphs, ocr):
+    def __init__(self, save_dir, n_images, image_n_objects, image_n_ocr, ocr):
         self.save_dir = os.path.join(save_dir, 'targets')
         if not os.path.exists(self.save_dir):
             os.mkdir(self.save_dir)
-        self.image_ix_to_id = image_ix_to_id
+        self.n_images = n_images
+        self.image_n_ocr = image_n_ocr
+        self.image_n_objects = image_n_objects
         self.ocr = ocr
-        self.scene_graphs = scene_graphs
 
     def generate(self):
-        n_images = len(self.image_ix_to_id)
-        for image_index in tqdm(range(n_images),
+        for image_index in tqdm(range(self.n_images),
                                 unit='image',
                                 desc='target generation'):
-            image_id = self.image_ix_to_id[str(image_index)]
-            n_ocr = len(self.ocr[image_id])
-            image_scene_graph = self.scene_graphs[image_id]
-            n_objects = len(image_scene_graph['objects'])
+            n_ocr = self.image_n_ocr[image_index]
+            n_objects = self.image_n_objects[image_index]
             n_nodes = n_objects + n_ocr
             image_target = np.zeros((n_nodes, 2), dtype='float32')
             image_target[:n_objects, 0] = 1
@@ -157,37 +152,97 @@ class DataSet:
     def __init__(self,
                  tier,
                  save_dir,
-                 ids_map_dir,
                  data_root,
                  word_emb_config):
         self.tier = tier
+
+        # create data save dir
         save_dir = os.path.join(save_dir, 'textvqa_{}'.format(tier))
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
-        ids_map_dir = os.path.join(ids_map_dir, '{}_ids_map.json'.format(tier))
-        scene_graph_dir = os.path.join(data_root, 'scene_graph', '{}_sg.json'.format(tier))
-        visual_feature_dir = os.path.join(data_root, 'object_visual_feature', '{}_objects.h5'.format(tier))
-        if tier == 'val':
-            ocr_dir = os.path.join(data_root, 'ocr', '{}_ocr.json'.format('train'))
-        else:
-            ocr_dir = os.path.join(data_root, 'ocr', '{}_ocr.json'.format(tier))
-        adj_matrix_dir = os.path.join(data_root, 'adjacent_matrix', '{}_edge_rdiou.json'.format(tier))
 
+        # read ids map
+        ids_map_dir = os.path.join(data_root,
+                                   'ids_map',
+                                   '{}_ids_map.json'.format(tier))
         with open(ids_map_dir, 'r') as f:
             image_ix_to_id = json.load(f)['image_ix_to_id']
+        n_images = len(image_ix_to_id)
+
+        # read node json file
+        node_dir = os.path.join(data_root,
+                                'scene_graph',
+                                '{}_sg.json'.format(tier))
+        with open(node_dir, 'r') as f:
+            nodes = json.load(f)
+        n_nodes = len(nodes)
+        image_n_nodes = {}  # recode number of node for each image
+        for image_index in range(n_images):
+            image_id = image_ix_to_id[str(image_index)]
+            image_n_nodes[image_index] = len(nodes[image_id])
+
+        # read visual feature h5 file
+        visual_feature_dir = os.path.join(data_root,
+                                          'object_visual_feature',
+                                          '{}_objects.h5'.format(tier))
+        visual_feature_h5 = h5py.File(visual_feature_dir, 'r')
+        n_objects = len(visual_feature_h5['features'])
+        image_n_objects = {}
+        for image_index in range(n_images):
+            image_n_objects[image_index] = len(delete_zero_padding(visual_feature_h5[image_index]))
+
+        # read ocr
+        if tier == 'val':
+            ocr_dir = os.path.join(data_root,
+                                   'ocr',
+                                   '{}_ocr.json'.format('train'))
+        else:
+            ocr_dir = os.path.join(data_root,
+                                   'ocr',
+                                   '{}_ocr.json'.format(tier))
         with open(ocr_dir, 'r') as f:
             ocr = json.load(f)
-        with open(scene_graph_dir, 'r') as f:
-            scene_graphs = json.load(f)
+        n_ocr = len(ocr)
+        image_n_ocr = {}
+        for image_index in range(n_images):
+            image_id = image_ix_to_id[str(image_index)]
+            image_n_ocr[image_index] = len(ocr[image_id])
+
+        # read adjacent matrix
+        adj_matrix_dir = os.path.join(data_root,
+                                      'adjacent_matrix',
+                                      '{}_edge_rdiou.json'.format(tier))
+        with open(adj_matrix_dir, 'r') as f:
+            adj_matrix = json.load(f)
+        image_adj_dim = {}
+        for image_index in range(n_images):
+            image_id = image_ix_to_id[str(image_index)]
+            image_adj_dim[image_index] = len(adj_matrix[image_id])
+
+        # check input data correctness
+        assert n_images == n_nodes
+        assert n_images == n_objects
+        assert n_images == n_ocr
+        for image_index in range(n_images):
+            assert image_n_nodes[image_index] == image_adj_dim[image_index]
+            assert (image_n_objects[image_index] + image_n_ocr[image_index]) == image_n_nodes[image_index]
 
         self.node_feature = NodeFeature(save_dir,
                                         image_ix_to_id,
-                                        scene_graphs,
+                                        n_images,
+                                        nodes,
+                                        image_n_objects,
                                         ocr,
                                         visual_feature_dir,
                                         word_emb_config)
-        self.adjacent_matrix = AdjMatrix(save_dir, image_ix_to_id, adj_matrix_dir)
-        self.target = Target(save_dir, image_ix_to_id, scene_graphs, ocr)
+        self.adjacent_matrix = AdjMatrix(save_dir,
+                                         image_ix_to_id,
+                                         adj_matrix_dir)
+        self.target = Target(save_dir,
+                             n_images,
+                             image_n_objects,
+                             image_n_ocr,
+                             ocr)
 
     def generate(self):
         print('#### Generating graph data for {} images ####'.format(self.tier))
@@ -204,7 +259,6 @@ def main():
     for tier in tiers:
         data_set = DataSet(tier,
                            config.save_dir,
-                           config.ids_map_dir,
                            config.data_root,
                            config.word_emb_config)
         data_set.generate()
