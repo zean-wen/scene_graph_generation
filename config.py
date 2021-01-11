@@ -13,6 +13,6 @@ class Config:
     def __init__(self, args):
         self.tiers = args.tiers
         self.data_root = args.data_root
-        self.save_dir = args.data_root
+        self.save_dir = args.save_dir
         self.word_emb_config: WordEmbeddingConfig = WordEmbeddingConfig(self.data_root)
 
