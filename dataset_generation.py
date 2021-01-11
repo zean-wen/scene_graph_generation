@@ -218,7 +218,7 @@ class DataSet:
         # check input data correctness
         assert n_images == n_nodes
         assert n_images == n_objects
-        assert n_images == n_ocr
+        # assert n_images == n_ocr
         for image_index in range(n_images):
             assert image_n_nodes[image_index] == image_adj_dim[image_index]
             assert (image_n_objects[image_index] + image_n_ocr[image_index]) == image_n_nodes[image_index]
