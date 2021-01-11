@@ -1,33 +1,18 @@
-class BaseConfig:
-    @ classmethod
-    def copy_from_args(cls, args):
-        for key, value in vars(args).items():
-            if hasattr(cls, key):
-                setattr(cls, key, value)
-        return cls()
+import os
 
 
-class WordEmbeddingConfig(BaseConfig):
-    glove_dictionary_file: str = None
-    glove_word_matrix_file: str = None
-    fasttext_dictionary_file: str = None
-    fasttext_word_matrix_file: str = None
+class WordEmbeddingConfig:
+    def __init__(self, data_root):
+        self.glove_dictionary_file = os.path.join(data_root, 'word_embedding', 'glove_dictionary.json')
+        self.glove_word_matrix_file = os.path.join(data_root, 'word_embedding', 'glove6b_init_300d.npy')
+        self.fasttext_dictionary_file = os.path.join(data_root, 'word_embedding', 'fasttext_init_300d.npy')
+        self.fasttext_word_matrix_file = os.path.join(data_root, 'word_embedding', 'fasttext_dictionary.json')
 
 
-class Config(BaseConfig):
-    tiers: str = None
-    save_dir: str = None
-    ids_map_dir: str = None
-    data_root: str = None
-    scene_graph_folder: str = None
-    ocr_folder: str = None
-    visual_feature_folder: str = None
-    word_emb_config: WordEmbeddingConfig = WordEmbeddingConfig()
+class Config:
+    def __init__(self, args):
+        self.tiers = args.tiers
+        self.data_root = args.data_root
+        self.save_root = args.data_root
+        self.word_emb_config: WordEmbeddingConfig = WordEmbeddingConfig(self.data_root)
 
-    @ classmethod
-    def copy_from_args(cls, args):
-        for key, value in vars(args).items():
-            if hasattr(cls, key):
-                setattr(cls, key, value)
-        cls.word_emb_config = WordEmbeddingConfig.copy_from_args(args)
-        return cls()
