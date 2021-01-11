@@ -171,8 +171,8 @@ class DataSet:
 
         # read node json file
         node_dir = os.path.join(data_root,
-                                'scene_graph',
-                                '{}_sg.json'.format(tier))
+                                'nodes',
+                                '{}_nodes.json'.format(tier))
         with open(node_dir, 'r') as f:
             nodes = json.load(f)
         n_nodes = len(nodes)
