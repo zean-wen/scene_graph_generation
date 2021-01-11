@@ -253,7 +253,7 @@ class DataSet:
 
 def main():
     args = get_args()
-    config = Config.copy_from_args(args)
+    config = Config(args)
 
     tiers = config.tiers.split('_')
     for tier in tiers:
