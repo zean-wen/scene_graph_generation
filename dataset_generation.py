@@ -73,11 +73,7 @@ class NodeFeature:
         for image_index in tqdm(range(self.n_images),
                                 unit='image',
                                 desc='Object visual feature generation'):
-            image_object_visual_features = object_visual_features['features'][image_index]
-            # remove rows with only zero elements
-            image_object_visual_features = image_object_visual_features[~np.all(
-                image_object_visual_features == 0,
-                axis=1)]
+            image_object_visual_features = delete_zero_padding(object_visual_features['features'][image_index])
             with open(os.path.join(self.dir['object_visual_features'], '{}.p'.format(image_index)), 'wb') as f:
                 pickle.dump(image_object_visual_features, f)
         object_visual_features.close()
@@ -189,7 +185,7 @@ class DataSet:
         n_objects = len(visual_feature_h5['features'])
         image_n_objects = {}
         for image_index in range(n_images):
-            image_n_objects[image_index] = len(delete_zero_padding(visual_feature_h5[image_index]))
+            image_n_objects[image_index] = len(delete_zero_padding(visual_feature_h5['features'][image_index]))
 
         # read ocr
         if tier == 'val':
