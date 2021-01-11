@@ -158,6 +158,7 @@ class DataSet:
             os.mkdir(save_dir)
 
         # read ids map
+        print("Loading data...")
         ids_map_dir = os.path.join(data_root,
                                    'ids_map',
                                    '{}_ids_map.json'.format(tier))

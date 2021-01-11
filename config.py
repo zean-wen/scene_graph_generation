@@ -5,8 +5,8 @@ class WordEmbeddingConfig:
     def __init__(self, data_root):
         self.glove_dictionary_file = os.path.join(data_root, 'word_embedding', 'glove_dictionary.json')
         self.glove_word_matrix_file = os.path.join(data_root, 'word_embedding', 'glove6b_init_300d.npy')
-        self.fasttext_dictionary_file = os.path.join(data_root, 'word_embedding', 'fasttext_init_300d.npy')
-        self.fasttext_word_matrix_file = os.path.join(data_root, 'word_embedding', 'fasttext_dictionary.json')
+        self.fasttext_dictionary_file = os.path.join(data_root, 'word_embedding', 'fasttext_dictionary.json')
+        self.fasttext_word_matrix_file = os.path.join(data_root, 'word_embedding', 'fasttext_init_300d.npy')
 
 
 class Config:
